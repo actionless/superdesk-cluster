@@ -1,0 +1,124 @@
+dnsdock:
+    image: tonistiigi/dnsdock
+    volumes:
+        - /var/run/docker.sock:/run/docker.sock
+    ports:
+        - 172.17.42.1:53:53/udp
+
+# replica set 1:
+mongors1srv1:
+  image: mongo:2.6
+  links:
+   - mongors1srv2
+   - mongors1srv3
+  command: mongod --noprealloc --smallfiles --replSet rs1
+  volumes:
+   - ./data/mongo_rs1_srv1:/data/db
+  hostname: mongors1srv1
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongors1srv1
+
+mongors1srv2:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --replSet rs1
+  volumes:
+   - ./data/mongo_rs1_srv2:/data/db
+  hostname: mongors1srv2
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongors1srv2
+
+mongors1srv3:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --replSet rs1
+  volumes:
+   - ./data/mongo_rs1_srv3:/data/db
+  hostname: mongors1srv3
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongors1srv3
+
+# replica set 2:
+mongors2srv1:
+  image: mongo:2.6
+  links:
+   - mongors2srv2
+   - mongors2srv3
+  command: mongod --noprealloc --smallfiles --replSet rs2
+  volumes:
+   - ./data/mongo_rs2_srv1:/data/db
+  hostname: mongors2srv1
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongors2srv1
+
+mongors2srv2:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --replSet rs2
+  volumes:
+   - ./data/mongo_rs2_srv2:/data/db
+  hostname: mongors2srv2
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongors2srv2
+
+mongors2srv3:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --replSet rs2
+  volumes:
+   - ./data/mongo_rs2_srv3:/data/db
+  hostname: mongors2srv3
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongors2srv3
+
+# config servers:
+mongocfg1:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --configsvr --dbpath /data/db --port 27017
+  volumes:
+   - ./data/mongo_cfg1:/data/db
+  hostname: mongocfg1
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongocfg1
+
+mongocfg2:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --configsvr --dbpath /data/db --port 27017
+  volumes:
+   - ./data/mongo_cfg2:/data/db
+  hostname: mongocfg2
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongocfg2
+
+mongocfg3:
+  image: mongo:2.6
+  command: mongod --noprealloc --smallfiles --configsvr --dbpath /data/db --port 27017
+  volumes:
+   - ./data/mongo_cfg3:/data/db
+  hostname: mongocfg3
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongocfg3
+
+# router:
+mongos:
+  image: mongo:2.6
+  links:
+   - mongocfg1
+   - mongocfg2
+   - mongocfg3
+   - mongors1srv1
+   - mongors2srv1
+  command: mongos --port 27017 --configdb mongocfg1.mongo.docker:27017,mongocfg2.mongo.docker:27017,mongocfg3.mongo.docker:27017
+  ports:
+   - 27017:27017
+  volumes:
+   - ./data/mongos:/data/db
+  hostname: mongos
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=mongos
