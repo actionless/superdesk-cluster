@@ -1,0 +1,6 @@
+cluster.name: sdelc
+node.name: "node1"
+node.master: true
+node.data: true
+#discovery.zen.ping.multicast.enabled: false
+#discovery.zen.ping.unicast.hosts: ["elastic2.elasticsearch.docker", "elastic3.elasticsearch.docker"]

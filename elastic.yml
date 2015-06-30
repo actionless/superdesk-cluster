@@ -1,0 +1,39 @@
+dnsdock:
+    image: tonistiigi/dnsdock
+    volumes:
+        - /var/run/docker.sock:/run/docker.sock
+    ports:
+        - 172.17.42.1:53:53/udp
+
+elastic1:
+  image: elasticsearch:1.5
+  volumes:
+   - ./data/elastic1:/usr/share/elasticsearch/data
+   - ./config/elastic1.yml:/etc/elasticsearch.yml
+  command: elasticsearch -D es.config=/etc/elasticsearch.yml -Dnode.name=FoOBar
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=elastic1
+  ports:
+   - 9200:9200
+   - 9300:9300
+
+elastic2:
+  image: elasticsearch:1.5
+  volumes:
+   - ./data/elastic2:/usr/share/elasticsearch/data
+   - ./config/elastic1.yml:/etc/elasticsearch.yml
+  command: elasticsearch -D es.config=/etc/elasticsearch.yml
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=elastic2
+
+elastic3:
+  image: elasticsearch:1.5
+  volumes:
+   - ./data/elastic3:/usr/share/elasticsearch/data
+   - ./config/elastic1.yml:/etc/elasticsearch.yml
+  command: elasticsearch -D es.config=/etc/elasticsearch.yml
+  dns: 172.17.42.1
+  environment:
+   - DNSDOCK_NAME=elastic3
