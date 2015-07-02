@@ -22,7 +22,7 @@ elastic2:
   image: elasticsearch:1.5
   volumes:
    - ./data/elastic2:/usr/share/elasticsearch/data
-   - ./config/elastic1.yml:/etc/elasticsearch.yml
+   - ./config/elastic2.yml:/etc/elasticsearch.yml
   command: elasticsearch -D es.config=/etc/elasticsearch.yml
   dns: 172.17.42.1
   environment:
@@ -32,7 +32,7 @@ elastic3:
   image: elasticsearch:1.5
   volumes:
    - ./data/elastic3:/usr/share/elasticsearch/data
-   - ./config/elastic1.yml:/etc/elasticsearch.yml
+   - ./config/elastic3.yml:/etc/elasticsearch.yml
   command: elasticsearch -D es.config=/etc/elasticsearch.yml
   dns: 172.17.42.1
   environment:
